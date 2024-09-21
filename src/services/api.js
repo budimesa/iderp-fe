@@ -2,6 +2,7 @@
 import axios from 'axios';
 axios.defaults.withCredentials = true;
 axios.defaults.withXSRFToken = true;
+axios.defaults.headers.common['Authorization'] = `Bearer ${localStorage.getItem('token')}`;
 
 const apiClient = axios.create({
     baseURL: 'http://localhost:8000/api/', // Ganti dengan URL API Anda

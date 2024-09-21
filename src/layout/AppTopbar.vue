@@ -1,10 +1,3 @@
-<script setup>
-import { useLayout } from '@/layout/composables/layout';
-import AppConfigurator from './AppConfigurator.vue';
-
-const { onMenuToggle, toggleDarkMode, isDarkTheme } = useLayout();
-</script>
-
 <template>
     <div class="layout-topbar">
         <div class="layout-topbar-logo-container">
@@ -12,7 +5,7 @@ const { onMenuToggle, toggleDarkMode, isDarkTheme } = useLayout();
                 <i class="pi pi-bars"></i>
             </button>
             <router-link to="/" class="layout-topbar-logo">
-                <span>CJFI</span>
+                <span>PD JAYA</span>
             </router-link>
         </div>
 
@@ -54,8 +47,46 @@ const { onMenuToggle, toggleDarkMode, isDarkTheme } = useLayout();
                         <i class="pi pi-user"></i>
                         <span>Profile</span>
                     </button>
+                    <button type="button" class="layout-topbar-action" @click="logout">
+                        <i class="pi pi-sign-out"></i>
+                        <span>Logout</span>
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 </template>
+<script setup>
+import { useLayout } from '@/layout/composables/layout';
+import { useConfigStore } from '@/stores/configStore';
+import axios from 'axios';
+import { useRouter } from 'vue-router';
+import AppConfigurator from './AppConfigurator.vue';
+
+const { onMenuToggle, toggleDarkMode, isDarkTheme } = useLayout();
+const router = useRouter()
+const configStore = useConfigStore();
+
+const logout = async () => {
+  try {
+    const token = localStorage.getItem('token'); // Ambil token dari local storage
+    await axios.post(`${configStore.baseUrl}/logout`, 
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Tambahkan token di header
+        },
+        withCredentials: true,
+      }
+    );
+
+    // Hapus token dari local storage setelah logout
+    localStorage.removeItem('token');
+
+    // Redirect ke halaman login setelah logout berhasil
+    router.push('/login');
+  } catch (error) {
+    console.error('Logout failed', error);
+  }
+};
+</script>

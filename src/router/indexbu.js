@@ -1,10 +1,10 @@
-// import Login from '../views/Login.vue';
-// import UserProfile from '../views/UserProfile.vue';
 import AppLayout from '@/layout/AppLayout.vue';
 import { createRouter, createWebHistory } from 'vue-router';
+// // import Login from '../views/Login.vue';
+// // import UserProfile from '../views/UserProfile.vue';
+
 // const routes = [
 //     { path: '/login', name: 'login',  component: () => import('@/views/pages/auth/Login.vue') },
-    
 //     // { path: '/profile', component: UserProfile, meta: { requiresAuth: true } },
 // ];
 
@@ -13,6 +13,15 @@ import { createRouter, createWebHistory } from 'vue-router';
 //     routes,
 // });
 
+// // Middleware untuk memeriksa autentikasi
+// router.beforeEach((to, from, next) => {
+//     const isAuthenticated = !!localStorage.getItem('token');
+//     if (to.matched.some(record => record.meta.requiresAuth) && !isAuthenticated) {
+//         next('/login');
+//     } else {
+//         next();
+//     }
+// });
 const router = createRouter({
     history: createWebHistory(),
     routes: [
@@ -145,16 +154,6 @@ const router = createRouter({
             component: () => import('@/views/pages/auth/Error.vue')
         }
     ]
-});
-
-// Middleware untuk memeriksa autentikasi
-router.beforeEach((to, from, next) => {
-    const isAuthenticated = !!localStorage.getItem('token');
-    if (to.matched.some(record => record.meta.requiresAuth) && !isAuthenticated) {
-        next('/login');
-    } else {
-        next();
-    }
 });
 
 export default router;

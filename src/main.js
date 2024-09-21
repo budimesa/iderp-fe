@@ -1,15 +1,16 @@
 import '@/assets/styles.scss';
 import '@/assets/tailwind.css';
 import Aura from '@primevue/themes/aura';
+import { createPinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import ConfirmationService from 'primevue/confirmationservice';
 import ToastService from 'primevue/toastservice';
 import { createApp } from 'vue';
-import '../axios';
 import App from './App.vue';
 import router from './router';
 
 const app = createApp(App);
+const pinia = createPinia();
 
 app.use(router);
 app.use(PrimeVue, {
@@ -20,6 +21,7 @@ app.use(PrimeVue, {
         }
     }
 });
+app.use(pinia);
 app.use(ToastService);
 app.use(ConfirmationService);
 
