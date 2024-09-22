@@ -35,7 +35,7 @@
 
             <div class="layout-topbar-menu hidden lg:block">
                 <div class="layout-topbar-menu-content">
-                    <div>
+                    <!-- <div>
                         <button type="button" class="layout-topbar-action" @click="toggleMenu" >
                             <i class="pi pi-user"></i>
                             <span>Profile</span>
@@ -58,11 +58,15 @@
                             </div>
                         </div>
                         </OverlayPanel>
-                    </div>
-                    <!-- <button type="button" class="layout-topbar-action" @click="logout">
+                    </div> -->
+                    <button type="button" class="layout-topbar-action" @click="openModalChangePassword" >
+                            <i class="pi pi-lock"></i>
+                            <span>Change Password</span>
+                    </button>                
+                    <button type="button" class="layout-topbar-action" @click="handleLogout">
                         <i class="pi pi-sign-out"></i>
                         <span>Logout</span>
-                    </button> -->
+                    </button>
                 </div>
             </div>
         </div>
@@ -99,6 +103,7 @@
 </template>
 <script setup>
 import { useLayout } from '@/layout/composables/layout';
+import { useAuthStore } from '@/stores/auth';
 import { useConfigStore } from '@/stores/configStore';
 import axios from 'axios';
 import { useToast } from 'primevue/usetoast';
@@ -108,6 +113,7 @@ import AppConfigurator from './AppConfigurator.vue';
 
 const { onMenuToggle, toggleDarkMode, isDarkTheme } = useLayout();
 const router = useRouter()
+const authStore = useAuthStore();
 const configStore = useConfigStore();
 const overlay = ref(null);
 const currentPassword = ref('');
@@ -166,28 +172,33 @@ const changePassword = async () => {
     }
 };
 
-const logout = async () => {
-  try {
-    const token = localStorage.getItem('token'); // Ambil token dari local storage
-    await axios.post(`${configStore.baseUrl}/logout`, 
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${token}`, // Tambahkan token di header
-        },
-        withCredentials: true,
-      }
-    );
-
-    // Hapus token dari local storage setelah logout
-    localStorage.removeItem('token');
-
-    // Redirect ke halaman login setelah logout berhasil
-    router.push('/login');
-  } catch (error) {
-    console.error('Logout failed', error);
-  }
+const handleLogout = async () => {
+    await authStore.logout();
+    router.push('/login'); // Redirect to login page after logout
 };
+
+// const logout = async () => {
+//   try {
+//     const token = localStorage.getItem('token'); // Ambil token dari local storage
+//     await axios.post(`${configStore.baseUrl}/logout`, 
+//       {},
+//       {
+//         headers: {
+//           Authorization: `Bearer ${token}`, // Tambahkan token di header
+//         },
+//         withCredentials: true,
+//       }
+//     );
+
+//     // Hapus token dari local storage setelah logout
+//     localStorage.removeItem('token');
+
+//     // Redirect ke halaman login setelah logout berhasil
+//     router.push('/login');
+//   } catch (error) {
+//     console.error('Logout failed', error);
+//   }
+// };
 </script>
 <style>
 .p-popover:after, .p-popover:before {

@@ -1,75 +1,76 @@
-<!-- <script setup>
-import FloatingConfigurator from '@/components/FloatingConfigurator.vue';
-import { login } from '@/services/api';
-import { onMounted, ref } from 'vue';
-import { useRouter } from 'vue-router';
-
-const router = useRouter();
-const email = ref('');
-const password = ref('');
-const errorMessage = ref('');
-const token = localStorage.getItem('token');
-const checked = ref(false);
-
-onMounted(() => {
-    if (token) {
-        router.push('/');
-    }
-});
-
-const handleLogin = async () => {
-    try {
-        const response = await login(email.value, password.value);
-        localStorage.setItem('token', response.token);
-        // Redirect after successful login
-        router.push('/');
-    } catch (error) {
-        console.log(error);
-        errorMessage.value = error.response?.data?.message || 'Login failed';
-    }
-};
-</script> -->
 <script setup>
+// import FloatingConfigurator from '@/components/FloatingConfigurator.vue';
+// import { login } from '@/services/api';
+// import { onMounted, ref } from 'vue';
+// import { useRouter } from 'vue-router';
+
+// const router = useRouter();
+// const email = ref('');
+// const password = ref('');
+// const errorMessage = ref('');
+// const token = localStorage.getItem('token');
+// const checked = ref(false);
+
+// onMounted(() => {
+//     if (token) {
+//         router.push('/');
+//     }
+// });
+
+// // Clear the error message when input changes
+// const clearError = () => {
+//     errorMessage.value = '';
+// };
+
+// const handleLogin = async () => {
+//     clearError(); // Clear any previous error message
+//     try {
+//         const response = await login(email.value, password.value);
+//         localStorage.setItem('token', response.token);
+//         // Redirect after successful login
+//         router.push('/');
+//     } catch (error) {
+//         console.log(error);
+//         if (error.response?.data?.message) {
+//             errorMessage.value = error.response.data.message;
+//         } else if (error.response?.data?.errors) {
+//             const messages = Object.values(error.response.data.errors).flat();
+//             errorMessage.value = messages.join(', '); // Combine error messages
+//         } else {
+//             errorMessage.value = 'Login failed';
+//         }
+//     }
+// };
 import FloatingConfigurator from '@/components/FloatingConfigurator.vue';
-import { login } from '@/services/api';
+import { useAuthStore } from '@/stores/auth';
 import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
+const authStore = useAuthStore();
 const router = useRouter();
 const email = ref('');
 const password = ref('');
-const errorMessage = ref('');
-const token = localStorage.getItem('token');
-const checked = ref(false);
 
 onMounted(() => {
-    if (token) {
+    if (authStore.token) {
         router.push('/');
     }
 });
 
 // Clear the error message when input changes
 const clearError = () => {
-    errorMessage.value = '';
+    authStore.errorMessage = '';
 };
 
 const handleLogin = async () => {
     clearError(); // Clear any previous error message
     try {
-        const response = await login(email.value, password.value);
-        localStorage.setItem('token', response.token);
+        await authStore.login(email.value, password.value);
         // Redirect after successful login
         router.push('/');
     } catch (error) {
+        // Handle error if needed
         console.log(error);
-        if (error.response?.data?.message) {
-            errorMessage.value = error.response.data.message;
-        } else if (error.response?.data?.errors) {
-            const messages = Object.values(error.response.data.errors).flat();
-            errorMessage.value = messages.join(', '); // Combine error messages
-        } else {
-            errorMessage.value = 'Login failed';
-        }
     }
 };
 </script>

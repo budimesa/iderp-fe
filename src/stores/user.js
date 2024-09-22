@@ -1,13 +1,14 @@
 import axios from 'axios';
 import { defineStore } from 'pinia';
-axios.defaults.withCredentials = true;
-axios.defaults.withXSRFToken = true;
-axios.defaults.headers.common['Authorization'] = `Bearer ${localStorage.getItem('token')}`;
 const apiClient = axios.create({
     baseURL: 'http://localhost:8000/api/',
     headers: {
+        'X-Requested-With': 'XMLHttpRequest',
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
     },
+    withCredentials: true,
+    withXSRFToken: true
 });
 
 export const useUserStore = defineStore('user', {
