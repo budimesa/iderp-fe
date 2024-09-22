@@ -5,7 +5,7 @@
                 <i class="pi pi-bars"></i>
             </button>
             <router-link to="/" class="layout-topbar-logo">
-                <span>PD JAYA</span>
+                <span>ERP</span>
             </router-link>
         </div>
 
@@ -35,37 +35,136 @@
 
             <div class="layout-topbar-menu hidden lg:block">
                 <div class="layout-topbar-menu-content">
-                    <button type="button" class="layout-topbar-action">
-                        <i class="pi pi-calendar"></i>
-                        <span>Calendar</span>
-                    </button>
-                    <button type="button" class="layout-topbar-action">
-                        <i class="pi pi-inbox"></i>
-                        <span>Messages</span>
-                    </button>
-                    <button type="button" class="layout-topbar-action">
-                        <i class="pi pi-user"></i>
-                        <span>Profile</span>
-                    </button>
-                    <button type="button" class="layout-topbar-action" @click="logout">
+                    <div>
+                        <button type="button" class="layout-topbar-action" @click="toggleMenu" >
+                            <i class="pi pi-user"></i>
+                            <span>Profile</span>
+                        </button>
+                        <OverlayPanel ref="overlay" :showCloseIcon="true">
+                        
+                        <div class="flex flex-col gap-4">
+                            <div>
+                                <ul class="list-none p-0 m-0 flex flex-col">
+                                    <li @click="openModalChangePassword" class="flex items-center gap-2 px-2 py-3 hover:bg-emphasis cursor-pointer rounded-border">
+                                    <i class="pi pi-lock"></i>
+                                    <span class="font-medium">Change Password</span>
+                                    </li>
+                                    
+                                    <li @click="logout" class="flex items-center gap-2 px-2 py-3 hover:bg-emphasis cursor-pointer rounded-border">
+                                        <i class="pi pi-sign-out"></i>
+                                        <span class="font-medium">Logout</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        </OverlayPanel>
+                    </div>
+                    <!-- <button type="button" class="layout-topbar-action" @click="logout">
                         <i class="pi pi-sign-out"></i>
                         <span>Logout</span>
-                    </button>
+                    </button> -->
                 </div>
             </div>
         </div>
     </div>
+    <Dialog v-model:visible="formDialog" modal header="Change Password" :style="{ width: '40rem' }">
+            <span class="text-surface-500 dark:text-surface-400 block mb-8">Update your password.</span>
+            
+            <div class="mb-4">
+                <label for="currentPassword" class="font-semibold block mb-2">Current Password</label>
+                <InputText id="currentPassword" type="password" v-model="currentPassword" class="w-full" autocomplete="off" required />
+                <small v-if="submitted && !currentPassword" class="text-red-500">Current Password is required.</small>
+                <small v-if="submitted && currentPasswordError" class="text-red-500">{{ currentPasswordError }}</small>
+            </div>
+            
+            <div class="mb-4">
+                <label for="newPassword" class="font-semibold block mb-2">New Password</label>
+                <InputText id="newPassword" type="password" v-model="newPassword" class="w-full" autocomplete="off" required />
+                <small v-if="submitted && !newPassword" class="text-red-500">New Password is required.</small>
+            </div>
+            
+            <div class="mb-8">
+                <label for="confirmNewPassword" class="font-semibold block mb-2">Confirm New Password</label>
+                <InputText id="confirmNewPassword" type="password" v-model="confirmNewPassword" class="w-full" autocomplete="off" required />
+                <small v-if="submitted && !confirmNewPassword" class="text-red-500">Confirm New Password is required.</small>
+                <small v-if="submitted && newPassword !== confirmNewPassword" class="text-red-500">New password and confirm password do not match.</small>
+            </div>
+            
+            <div class="flex justify-end gap-2">
+                <Button type="button" label="Cancel" severity="secondary" @click="hideDialog"></Button>
+                <Button type="button" label="Save" @click="changePassword"></Button>
+            </div>
+        </Dialog>
+
 </template>
 <script setup>
 import { useLayout } from '@/layout/composables/layout';
 import { useConfigStore } from '@/stores/configStore';
 import axios from 'axios';
+import { useToast } from 'primevue/usetoast';
+import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import AppConfigurator from './AppConfigurator.vue';
 
 const { onMenuToggle, toggleDarkMode, isDarkTheme } = useLayout();
 const router = useRouter()
 const configStore = useConfigStore();
+const overlay = ref(null);
+const currentPassword = ref('');
+const newPassword = ref('');
+const confirmNewPassword = ref('');
+const submitted = ref(false);
+const formDialog = ref(false);
+const currentPasswordError = ref(''); 
+const toast = useToast();
+const toggleMenu = (event) => {
+  overlay.value.toggle(event);
+};
+const openModalChangePassword = () => {
+    currentPassword.value = '';
+    newPassword.value = '';
+    confirmNewPassword.value = '';
+    submitted.value = false;
+    formDialog.value = true;
+};
+
+const hideDialog = () => {
+  formDialog.value = false;
+  submitted.value = false;
+};
+const changePassword = async () => {
+    submitted.value = true;
+    if(currentPassword.value && newPassword.value && confirmNewPassword.value ) {
+        currentPasswordError.value = ''; // Reset error message
+
+        if (!currentPassword.value) {
+            return; // Validasi currentPassword
+        }
+        if (newPassword.value !== confirmNewPassword.value) {
+            return;
+        }
+        try {
+            const token = localStorage.getItem('token'); // Retrieve token
+            const response = await axios.post(`${configStore.baseUrl}/change-password`, {
+                current_password: currentPassword.value,
+                new_password: newPassword.value,
+            }, {
+                headers: {
+                    Authorization: `Bearer ${token}`, // Include token in headers
+                },
+            });
+            toast.add({ severity: 'success', summary: 'Success', detail: 'Password updated successfully', life: 3000 });
+            hideDialog();
+        } catch (error) {
+            if (error.response && error.response.status === 403) {
+                currentPasswordError.value = 'Current password is incorrect.'; // Set pesan kesalahan jika password salah
+            } else {
+                console.error('Failed to change password', error);
+            }
+        }
+
+    }
+};
 
 const logout = async () => {
   try {
@@ -90,3 +189,8 @@ const logout = async () => {
   }
 };
 </script>
+<style>
+.p-popover:after, .p-popover:before {
+    left: 10.25rem !important;
+}
+</style>
