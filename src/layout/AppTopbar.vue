@@ -35,30 +35,6 @@
 
             <div class="layout-topbar-menu hidden lg:block">
                 <div class="layout-topbar-menu-content">
-                    <!-- <div>
-                        <button type="button" class="layout-topbar-action" @click="toggleMenu" >
-                            <i class="pi pi-user"></i>
-                            <span>Profile</span>
-                        </button>
-                        <OverlayPanel ref="overlay" :showCloseIcon="true">
-                        
-                        <div class="flex flex-col gap-4">
-                            <div>
-                                <ul class="list-none p-0 m-0 flex flex-col">
-                                    <li @click="openModalChangePassword" class="flex items-center gap-2 px-2 py-3 hover:bg-emphasis cursor-pointer rounded-border">
-                                    <i class="pi pi-lock"></i>
-                                    <span class="font-medium">Change Password</span>
-                                    </li>
-                                    
-                                    <li @click="logout" class="flex items-center gap-2 px-2 py-3 hover:bg-emphasis cursor-pointer rounded-border">
-                                        <i class="pi pi-sign-out"></i>
-                                        <span class="font-medium">Logout</span>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        </OverlayPanel>
-                    </div> -->
                     <button type="button" class="layout-topbar-action" @click="openModalChangePassword" >
                             <i class="pi pi-lock"></i>
                             <span>Change Password</span>
@@ -105,7 +81,6 @@
 import { useLayout } from '@/layout/composables/layout';
 import { useAuthStore } from '@/stores/auth';
 import { useConfigStore } from '@/stores/configStore';
-import axios from 'axios';
 import { useToast } from 'primevue/usetoast';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
@@ -150,15 +125,7 @@ const changePassword = async () => {
             return;
         }
         try {
-            const token = localStorage.getItem('token'); // Retrieve token
-            const response = await axios.post(`${configStore.baseUrl}/change-password`, {
-                current_password: currentPassword.value,
-                new_password: newPassword.value,
-            }, {
-                headers: {
-                    Authorization: `Bearer ${token}`, // Include token in headers
-                },
-            });
+            await authStore.changePassword(currentPassword.value, newPassword.value);
             toast.add({ severity: 'success', summary: 'Success', detail: 'Password updated successfully', life: 3000 });
             hideDialog();
         } catch (error) {
@@ -176,29 +143,6 @@ const handleLogout = async () => {
     await authStore.logout();
     router.push('/login'); // Redirect to login page after logout
 };
-
-// const logout = async () => {
-//   try {
-//     const token = localStorage.getItem('token'); // Ambil token dari local storage
-//     await axios.post(`${configStore.baseUrl}/logout`, 
-//       {},
-//       {
-//         headers: {
-//           Authorization: `Bearer ${token}`, // Tambahkan token di header
-//         },
-//         withCredentials: true,
-//       }
-//     );
-
-//     // Hapus token dari local storage setelah logout
-//     localStorage.removeItem('token');
-
-//     // Redirect ke halaman login setelah logout berhasil
-//     router.push('/login');
-//   } catch (error) {
-//     console.error('Logout failed', error);
-//   }
-// };
 </script>
 <style>
 .p-popover:after, .p-popover:before {

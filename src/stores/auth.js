@@ -32,8 +32,13 @@ export const useAuthStore = defineStore('auth', {
             }
         },
         async logout() {
+            await apiClient.post('/logout');
             this.token = null;
             localStorage.removeItem('token');
+        },
+        async changePassword(current_password, new_password) {
+            const response = await apiClient.post('/change-password', { current_password, new_password });
+            this.users = response.data;
         },
         handleError(error) {
             if (error.response?.data?.message) {
