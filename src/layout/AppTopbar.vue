@@ -80,7 +80,6 @@
 <script setup>
 import { useLayout } from '@/layout/composables/layout';
 import { useAuthStore } from '@/stores/auth';
-import { useConfigStore } from '@/stores/configStore';
 import { useToast } from 'primevue/usetoast';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
@@ -89,7 +88,6 @@ import AppConfigurator from './AppConfigurator.vue';
 const { onMenuToggle, toggleDarkMode, isDarkTheme } = useLayout();
 const router = useRouter()
 const authStore = useAuthStore();
-const configStore = useConfigStore();
 const overlay = ref(null);
 const currentPassword = ref('');
 const newPassword = ref('');
