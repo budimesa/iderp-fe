@@ -18,16 +18,17 @@ const model = ref([
                 icon: 'pi pi-fw pi-user',
                 to: '/pages/users'
             },
+        ]
+    },
+    {
+        label: 'Master',
+        to: '/pages',
+        items: [
             {
-                label: 'Not Found',
-                icon: 'pi pi-fw pi-exclamation-circle',
-                to: '/pages/notfound'
+                label: 'General Data',
+                icon: 'pi pi-fw pi-table',
+                to: '/pages/users'
             },
-            {
-                label: 'Empty',
-                icon: 'pi pi-fw pi-circle-off',
-                to: '/pages/empty'
-            }
         ]
     },
     {
