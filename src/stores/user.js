@@ -18,7 +18,11 @@ export const useUserStore = defineStore('user', {
     actions: {
         async fetchUsers() {
             const response = await apiClient.get('/users');
-            this.users = response.data;
+            this.users = response.data.map(user => ({
+                ...user,
+                created_at: new Date(user.created_at), // Mengonversi ke objek Date
+                updated_at: new Date(user.updated_at),
+            }));
         },
         async createUser(name, email, password) {
             await apiClient.post('/users', { name, email, password });

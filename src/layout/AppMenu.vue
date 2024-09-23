@@ -16,7 +16,7 @@ const model = ref([
             {
                 label: 'User Management',
                 icon: 'pi pi-fw pi-user',
-                to: '/pages/crud'
+                to: '/pages/users'
             },
             {
                 label: 'Not Found',
