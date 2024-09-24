@@ -20,7 +20,7 @@ export const useUserStore = defineStore('user', {
             const response = await apiClient.get('/users');
             this.users = response.data.map(user => ({
                 ...user,
-                created_at: new Date(user.created_at), // Mengonversi ke objek Date
+                created_at: new Date(user.created_at),
                 updated_at: new Date(user.updated_at),
             }));
         },
